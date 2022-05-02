@@ -12,4 +12,4 @@ app.listen(port, () => {
   console.log(message);
 });
 
-export default app;
+module.exports = app;
