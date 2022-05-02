@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb';
+import MongoClient from 'mongodb';
 
 class DBClient {
   constructor() {
@@ -9,11 +9,9 @@ class DBClient {
     const col = ':';
     const url = url1st + host + col + port;
 
-    this.client = new MongoClient(url, { useUnifiedTopology: true });
-    this.client.connect((error, client) => {
-      if (!error) {
+    MongoClient.connect(url, { useUnifiedTopology: true }, (error, client) => {
+      if (client) {
         this.db = client.db(DB);
-        this.users = this.db.collection('users');
         this.files = this.db.collection('files');
       } else {
         console.log(error);
@@ -22,11 +20,12 @@ class DBClient {
   }
 
   isAlive() {
-    return this.client.isConnected();
+    if (this.db) return true;
+    return false;
   }
 
   async nbUsers() {
-    const num = await this.users.countDocuments({});
+    const num = await this.db.collection('users').countDocuments({});
     return num;
   }
 
@@ -36,4 +35,4 @@ class DBClient {
 }
 
 const dbClient = new DBClient();
-module.exports = dbClient;
+export default dbClient;
