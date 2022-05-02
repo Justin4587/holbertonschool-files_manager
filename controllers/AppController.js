@@ -10,11 +10,11 @@ class AppController {
   }
 
   static async getStats(req, res) {
-    const usenum = await dbClient.nbUsers();
-    const filenum = await dbClient.nbFiles();
+    const users = await dbClient.nbUsers();
+    const files = await dbClient.nbFiles();
 
     res.status(200);
-    res.json({ usenum, filenum });
+    res.json({ users, files });
   }
 }
 
