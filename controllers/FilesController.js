@@ -56,7 +56,7 @@ class FilesController {
       });
     }
     if (type === 'file' || type === 'folder') {
-      return res.status(201).json(tempFile);
+      return res.status(201).send(tempFile);
     }
     return res.status(201).json({
       id: tempFile.insertedId, userId: userId._id, name, type, isPublic, parentId,
