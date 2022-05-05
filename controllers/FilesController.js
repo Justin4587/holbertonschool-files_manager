@@ -19,7 +19,7 @@ class FilesController {
     if (!type) return res.status(400).json({ error: 'Missing type' });
     if (!data && type !== 'folder') return res.status(400).json({ error: 'Missing data' });
 
-    let parentId = 0;
+    let { parentId = 0 } = req.body;
     try { parentId = req.body.parentId || 0; } catch (err) { console.log(err.message); }
 
     if (parentId !== 0) {
