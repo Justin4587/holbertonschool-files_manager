@@ -19,7 +19,9 @@ class FilesController {
     if (!type) return res.status(400).json({ error: 'Missing type' });
     if (!data && type !== 'folder') return res.status(400).json({ error: 'Missing data' });
 
-    let { parentId = 0 } = req.body;
+    let parentId = req.body.parentId || 0;
+    parentId = parentId === '0' ? 0 : parentId;
+
     if (parentId !== 0) {
       parentId = new ObjectId(parentId);
       const fileCheck = await dbClient.db.collection('files').findOne({ _id: ObjectId(parentId) });
