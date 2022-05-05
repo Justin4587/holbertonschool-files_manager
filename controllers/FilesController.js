@@ -61,6 +61,54 @@ class FilesController {
       id: tempFile.insertedId, userId: userId._id, name, type, isPublic, parentId,
     });
   }
+
+  static async getShow(req, res) {
+    const user = await userIdEmail(req);
+    if (!user) return res.status(401).json({ error: 'Unauthorized' });
+    const { id } = req.params;
+    const file = await dbClient.db.collection('files').findOne({ _id: ObjectId(id.parentId), userId: user._id });
+    if (!file) return res.status(404).json({ error: 'Not found' });
+
+    return res.status(200).json({
+      id: file._id,
+      userId: file.userId,
+      name: file.name,
+      type: file.type,
+      isPublic: file.isPublic,
+      parentId: file.parentId,
+    });
+  }
+
+  static async getIndex(req, res) {
+    const user = await userIdEmail(req);
+    const { parentId = 0, page = 0 } = req.query;
+    let pages;
+    if (parentId !== 0) {
+      const objId = ObjectId(parentId);
+      pages = await dbClient.db.collection('files').aggregate([
+        { $match: { parentId: objId } },
+        { $skip: page * 20 },
+        { $limit: 20 },
+      ]).toArray();
+    } else {
+      const objId = ObjectId(user._id);
+      pages = await dbClient.db.collection('files').aggregate([
+        { $match: { userId: objId } },
+        { $skip: page * 20 },
+        { $limit: 20 },
+      ]).toArray();
+    }
+
+    const ret = pages.map((page) => ({
+      id: page._id,
+      userId: page.userId,
+      name: page.name,
+      type: page.type,
+      isPublic: page.isPublic,
+      parentId: page.parentId,
+    }));
+    return res.json(ret);
+  }
 }
 
 export default FilesController;
