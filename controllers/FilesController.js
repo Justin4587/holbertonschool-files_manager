@@ -55,7 +55,7 @@ class FilesController {
         localPath,
       });
     }
-    if (type === 'file' || type === 'folder') {
+    if (type === 'file' || type === 'image') {
       return res.status(201).send(tempFile);
     }
     return res.status(201).json({
