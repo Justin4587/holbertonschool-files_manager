@@ -44,7 +44,7 @@ class FilesController {
       const localPath = filePath + slash + uId;
       const buffData = Buffer.from(data, 'base64').toString();
 
-      await fs.promises.writeFile(localPath, buffData);
+      await fs.promises.writeFile(localPath, buffData, { flag: 'w+' });
 
       tempFile = await dbClient.db.collection('files').insertOne({
         userId: new ObjectId(userId._id),
@@ -54,9 +54,6 @@ class FilesController {
         parentId,
         localPath,
       });
-    }
-    if (type === 'file' || type === 'image') {
-      return res.status(201).send(tempFile);
     }
     return res.status(201).json({
       id: tempFile.insertedId, userId: userId._id, name, type, isPublic, parentId,
