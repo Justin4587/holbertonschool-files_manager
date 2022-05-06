@@ -66,7 +66,7 @@ class FilesController {
     const user = await userIdEmail(req);
     if (!user) return res.status(401).json({ error: 'Unauthorized' });
     const { id } = req.params;
-    const file = await dbClient.db.collection('files').findOne({ _id: ObjectId(id.parentId), userId: user._id });
+    const file = await dbClient.db.collection('files').findOne({ _id: ObjectId(id), userId: user._id });
     if (!file) return res.status(404).json({ error: 'Not found' });
 
     return res.status(200).json({
