@@ -15,7 +15,7 @@ async function userIdEmail(req, res) {
 
     return user;
   } catch (error) {
-    return { error: 'here I am' };
+    return null;
   }
 }
 
