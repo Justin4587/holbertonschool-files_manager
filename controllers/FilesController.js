@@ -8,7 +8,7 @@ import userIdEmail from '../utils/userUtils';
 class FilesController {
   static async postUpload(req, res) {
     const userId = await userIdEmail(req);
-    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+    if (!userId) return res.status(401).json({ error: 'U3nauthorized' });
 
     const {
       name,
@@ -65,7 +65,7 @@ class FilesController {
   static async getShow(req, res) {
     const user = await userIdEmail(req);
     console.log(user);
-    if (!user._id) return res.status(401).json({ error: 'Unauthorized' });
+    if (!user) return res.status(401).json({ error: 'Unauthorized' });
     const { id } = req.params;
     const file = await dbClient.db.collection('files').findOne({ _id: ObjectId(id), userId: user._id });
     if (!file) return res.status(404).json({ error: 'Not found' });
