@@ -9,6 +9,7 @@ async function userIdEmail(req, res) {
     const key1 = 'auth_';
     const key = key1 + token;
     const uID = await redisClient.get(key);
+    if (!uID) return res.status(401).json({ error: 'Unauthorized' });
     const user = await dbClient.db.collection('users').findOne({ _id: ObjectId(uID) });
     if (!user) return res.status(401).json({ error: 'Unauthorized' });
 
