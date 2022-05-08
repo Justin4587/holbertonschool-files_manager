@@ -11,7 +11,7 @@ async function userIdEmail(req, res) {
     const uID = await redisClient.get(key);
     if (!uID) return null;
     const user = await dbClient.db.collection('users').findOne({ _id: ObjectId(uID) });
-    if (!user) return null;
+    if (!user._id) return null;
 
     return user;
   } catch (error) {
