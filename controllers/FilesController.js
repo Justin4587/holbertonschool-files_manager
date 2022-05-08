@@ -8,7 +8,7 @@ import userIdEmail from '../utils/userUtils';
 class FilesController {
   static async postUpload(req, res) {
     const userId = await userIdEmail(req);
-    if (!userId._id) return res.status(401).json({ error: 'Unauthorized' });
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
     const {
       name,
