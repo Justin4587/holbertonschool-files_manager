@@ -1,8 +1,11 @@
 import { ObjectId } from 'mongodb';
+import Bull from 'bull';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 
 const { createHash } = require('crypto');
+
+const userQueue = new Bull('userQueue');
 
 class UsersController {
   static async postNew(req, res) {
@@ -14,13 +17,13 @@ class UsersController {
       if (!upass) return res.status(400).json({ error: 'Missing password' });
 
       const checkemail = await dbClient.db.collection('users').findOne({ email: umail });
-      if (checkemail) return res.status(400).json({ error: 'Already exist' });
+      if (checkemail) return res.status(400).json({ error: 'Already eeist' });
 
       const uPassHash = createHash('sha1');
       uPassHash.update(upass);
 
       const uID = await dbClient.db.collection('users').insertOne({ email: umail, password: uPassHash.digest('hex') });
-
+      if (uID) userQueue.add({ userId: uID.insertedId, email: umail });
       return res.status(201).json({ id: uID.insertedId, email: umail });
     } catch (err) {
       console.log(err);

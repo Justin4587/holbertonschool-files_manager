@@ -2,9 +2,12 @@ import { ObjectId } from 'mongodb';
 import { v4 as uuid } from 'uuid';
 import fs from 'fs';
 import mime from 'mime-types';
+import Bull from 'bull';
 
 import dbClient from '../utils/db';
 import userIdEmail from '../utils/userUtils';
+
+const fileQueue = new Bull('fileQueue');
 
 class FilesController {
   static async postUpload(req, res) {
@@ -58,6 +61,7 @@ class FilesController {
         localPath,
       });
     }
+    if (tempFile.type === 'image') fileQueue.add({ userId: tempFile.userId, fileId: tempFile._id });
     return res.status(201).json({
       id: tempFile.insertedId, userId: userId._id, name, type, isPublic, parentId,
     });
@@ -154,11 +158,13 @@ class FilesController {
     const userId = await userIdEmail(req);
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
     const { id } = req.params;
+    const { size } = req.query;
     const file = await dbClient.db.collection('files').findOne({ _id: ObjectId(id), userId: userId._id });
     if (!file) return res.status(404).json({ error: 'Not found' });
-
     if (!file.isPublic && !file.userId) return res.status(404).json({ error: 'Not found' });
     if (file.type === 'folder') return res.status(400).json({ error: "A folder doesn't have content" });
+    const uScore = '_';
+    if (size) file.localPath = file.localPath + uScore + size;
     if (!fs.existsSync(file.localPath)) return res.status(404).json({ error: 'Not found' });
 
     const mimeType = mime.contentType(file.name);
